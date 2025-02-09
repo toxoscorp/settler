@@ -17,5 +17,6 @@ set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
 # install(TARGETS ${PROJECT_NAME} DESTINATION bin)
 
-include(CTest)
+add_subdirectory(tests)
+
 enable_testing()
