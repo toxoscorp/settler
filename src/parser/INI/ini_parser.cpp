@@ -4,6 +4,24 @@
 #include <iostream>
 #include <string>
 
+void strip(std::string *line) {
+  while (line->size() > 0 && line->at(0) == ' ') {
+    line->erase(0, 1);
+  }
+  while (line->size() > 0 && line->at(line->size() - 1) == ' ') {
+    line->erase(line->size() - 1, 1);
+  }
+}
+
+void remove_comment(std::string *line) {
+  if (line->find(';') != std::string::npos) {
+    line->erase(line->find(';'), line->size());
+  }
+  if (line->find('#') != std::string::npos) {
+    line->erase(line->find('#'), line->size());
+  }
+}
+
 settler::INIConfig settler::INIParser::Read(const std::string &filepath) {
   std::ifstream filestream;
   settler::INIConfig config;
@@ -15,10 +33,15 @@ settler::INIConfig settler::INIParser::Read(const std::string &filepath) {
 
   std::string section = "";
   std::string line;
+  bool multiline = false;
   while (std::getline(filestream, line)) {
+    strip(&line);
+    remove_comment(&line);
     std::cout << "line : " << line << std::endl;
-    if (line[0] == '[') {
-      section = line.substr(1, line.size() - 2);
+    if (line[0] == '[' && line.find(']') != std::string::npos) {
+      section = line.substr(1, line.find(']') - 1);
+    } else if (line[0] == ';' || line[0] == '#') {
+      continue;
     } else if (line.find('=') != std::string::npos) {
       std::string option = line.substr(0, line.find('='));
       std::string value = line.substr(line.find('=') + 1, line.size());
